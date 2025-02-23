@@ -48,6 +48,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'mysite.middleware.RedirectAuthenticatedUserMiddleware',
+    'mysite.middleware.RestrictUnauthenticatedUserMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -142,4 +144,18 @@ LOGGING = {
         "level": "DEBUG" 
     },
 }
- 
+
+DEFAULT_FROM_EMAIL = 'jaiganesh10052004@gmail.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER='c49cc07a5dffad'
+EMAIL_HOST_PASSWORD='<2f60629473ffd0'
+
+import os
+
+MEDIA_URL = '/media/'
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

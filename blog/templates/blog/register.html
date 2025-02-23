@@ -5,34 +5,18 @@
         <div class="row d-flex justify-content-center mt-5">
             <div class="col-4">
                 <h3>Register</h3>
-                {% comment %} <div class="">
-                    <!-- Error messages -->
-                    <div class="col-12">
-                        <span class="fw-bold">Username</span>
-                        <span class="text-danger">[Error message for username]</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="fw-bold">Email</span>
-                        <span class="text-danger">[Error message for email]</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="fw-bold">Password</span>
-                        <span class="text-danger">[Error message for password]</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="fw-bold">Confirm Password</span>
-                        <span class="text-danger">[Error message for confirm password]</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="text-danger">[Non-field error]</span>
-                    </div>
-                </div> {% endcomment %}
                 <div class="my-3">
+                    {% comment %} {%if success_message%}
+                        <div class="alert alert-success">
+                        {{ success_message }}
+                        </div>
+                    {% endif %} {% endcomment %}
+                    {%include 'blog/include/error.html'%}
                     <form method="post">
                         {% csrf_token %} 
                         <div class="form-group">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" value="" >
+                            <input type="text" class="form-control" id="username" name="username" value="{{form.username.value|default:""}}" >
                             {% if form.username.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.username.errors.0 }}</p>
@@ -41,7 +25,7 @@
                         </div>
                         <div class="form-group">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="" >
+                            <input type="email" class="form-control" id="email" name="email" value="{{form.email.value|default:""}}" >
                             {% if form.email.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.email.errors.0 }}</p>
@@ -50,7 +34,7 @@
                         </div>
                         <div class="form-group">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" >
+                            <input type="password" class="form-control" id="password" name="password">
                             {% if form.password.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.password.errors.0 }}</p>
@@ -59,12 +43,12 @@
                         </div>
                         <div class="form-group">
                             <label for="confirm_password" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="confirm_password" name="password_confirm" required>
-                            {% comment %} {% if form.confirm_password.errors %}
-                            <div class="col-12">
-                                <p class="text-danger">{{ form.confirm_password.errors.0 }}</p>
+                            <input type="password" class="form-control" id="confirm_password" name="password_confirm"  >
+                             {% if form.password_confirm.errors %}
+                             <div class="col-12">
+                                <p class="text-danger">{{ form.password_confirm.errors.0 }}</p>
                             </div>
-                            {% endif %} {% endcomment %}
+                            {% endif %}
                         </div>
                         <div class="my-3 d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary">Register</button>

@@ -4,10 +4,17 @@
             <a href="/" class="text-light text-decoration-none"><h3>Blog test</h3></a>
         </div>
         <div class="col">
-            <div style="padding-right:10px;" class="d-flex justify-content-end gap-3">
+            <div  class="d-flex justify-content-end gap-3">
                 <a class="text-light text-decoration-none" href="/">Home</a>
                 <a class="text-light text-decoration-none" href="/about">About</a>
                 <a class="text-light text-decoration-none" href="/contact">Contact</a>
+                {% if user.is_authenticated %}
+                <a class="text-light text-decoration-none" href={%url 'blog:dashboard'%}>Dashboard</a>
+                <a class="text-light text-decoration-none" href="/logout">Logout</a>
+                {%else%}
+                <a class="text-light text-decoration-none" href={%url 'blog:register'%}>Register</a>
+                <a class="text-light text-decoration-none" href={%url 'blog:login'%}>Login</a>
+                {% endif %}
             </div>
         </div>
     </div>

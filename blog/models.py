@@ -14,10 +14,11 @@ class Category(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    img_url = models.ImageField(null=True)  #, upload_to="posts/images")
+    img_url = models.ImageField(max_length=255,upload_to="posts/images")  #, upload_to="posts/images")
     created_at = models.DateTimeField(auto_now_add=True)
     slug=models.SlugField(unique=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    user=models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
