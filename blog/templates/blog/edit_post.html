@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row d-flex justify-content-center mt-5">
             <div class="col-4">
-                <h3>New Post</h3>
+                <h3>Edit Post</h3>
                 <div>
                 {% include 'blog/include/error.html'%}
                 </div>
@@ -14,7 +14,7 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" name="title" id="title" value="{{form.title.value|default:""}}">
+                            <input type="text" class="form-control" name="title" id="title" value="{{post.title|default:""}}">
                             {% if form.title.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.title.errors.0 }}</p>
@@ -24,7 +24,7 @@
                        
                         <div class="form-group">
                             <label for="content" class="form-label">Content</label>
-                            <textarea class="form-control" id="content" name="content" >{{form.content.value|default:""}}</textarea>
+                            <textarea class="form-control" id="content" name="content" >{{post.content|default:""}}</textarea>
                             {% if form.content.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.content.errors.0 }}</p>
@@ -38,7 +38,7 @@
                                 <option value="">Select</option>
                                 {%if categories%}
                                     {%for category in categories%}
-                                        <option value="{{category.id}}">{{category.name}}</option>
+                                        <option {% if post.category.id == category.id %}selected {% endif %} value="{{category.id}}">{{category.name}}</option>
                                     {%endfor%}
                                 {%endif%}
                             </select>
@@ -57,8 +57,9 @@
                             </div>
                             {% endif %} {% endcomment %}
                         </div>
+                       
                         <div class="my-3 d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Create</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </form>
                 </div>

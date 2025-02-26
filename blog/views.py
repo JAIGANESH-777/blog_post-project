@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse
 from django.urls import reverse
 import logging
@@ -29,7 +29,7 @@ from django.contrib.auth.models import Group
 #         {'id':4, 'title': 'Post 4', 'content': 'Content of Post 4'},   
 #     ]
 def index(request):
-    all_post= Post.objects.all()
+    all_post= Post.objects.filter(is_published=True)
     paginator= Paginator(all_post,9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -88,6 +88,8 @@ def register(request):
             user=form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
+            readers_group=Group.objects.get_or_create(name="Readers")
+            user.groups.add(readers_group[0])
             #success_message="Registration Successful"
             messages.success(request, "Registration Successful")
             return redirect('blog:login')
@@ -123,7 +125,7 @@ def logout(request):
     return redirect('blog:index')
 
 
-def forgotpassword(request):
+def forgot_password(request):
     title= "Forgot Password"
     form = ForgotPasswordForm()
     if request.method == 'POST':
@@ -150,7 +152,7 @@ def forgotpassword(request):
 
     return render(request,'blog/forgot_password.html', {'form': form})
  
-def resetpassword(request, uidb64, token):
+def reset_password(request, uidb64, token):
     title= "Reset Password"
     form = ResetPasswordForm()
     if request.method == 'POST':
@@ -174,7 +176,9 @@ def resetpassword(request, uidb64, token):
 
     return render(request,'blog/reset_password.html', {'form': form,"title": title})
 
-def newpost(request):
+
+@login_required
+def new_post(request):
     title= "New Post"
     form=NewPostForm()
     categories=Category.objects.all()
@@ -187,3 +191,33 @@ def newpost(request):
             messages.success(request, "Post created successfully")
             return redirect('blog:dashboard')
     return render(request,"blog/new_post.html",{"title":title,"categories":categories,"form":form})
+
+@login_required
+def edit_post(request,post_id):
+    title= "Edit Post"
+    form=NewPostForm()
+    categories=Category.objects.all()
+    post=get_object_or_404(Post,id=post_id)
+    if request.method=="POST":
+        form=NewPostForm(request.POST,request.FILES,instance=post)
+        if form.is_valid():
+            post.save()
+            messages.success(request, "Post updated successfully")
+            return redirect('blog:dashboard')
+    #selected_category_id = post.category.id
+    return render(request,"blog/edit_post.html",{"categories":categories,"title":title,"post":post,"form":form})
+
+@login_required
+def delete_post(request,post_id):
+    post=get_object_or_404(Post,id=post_id)
+    post.delete()
+    messages.success(request, "Post deleted successfully")
+    return redirect('blog:dashboard')
+
+@login_required
+def publish_post(request,post_id):
+    post=get_object_or_404(Post,id=post_id)
+    post.is_published=True
+    post.save()
+    messages.success(request, "Post published successfully")
+    return redirect('blog:dashboard')
