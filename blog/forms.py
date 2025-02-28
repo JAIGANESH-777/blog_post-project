@@ -2,12 +2,22 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
-from blog.models import Category, Post
+from blog.models import Category, Contact, Post
 
-class ContactForm(forms.Form):
+class ContactForm(forms.ModelForm):
     name=forms.CharField(label="Name",max_length=100,required=True)
     email=forms.EmailField(label="Email",required=True)
     message=forms.CharField(label="Message",required=True)
+
+    class Meta:
+        model= Contact
+        fields=['name','email','message']
+
+    def save(self, commit):
+        feedback = super().save(commit)
+        if commit:
+            feedback.save()
+        return feedback
 
 class RegisterForm(forms.ModelForm):
     username = forms.CharField(label='username', max_length=100, required=True)
@@ -76,10 +86,10 @@ class NewPostForm(forms.ModelForm):
 
 
         #custom validation
-        if title and len(title) < 5:
+        if title and len(title) < 3:
             raise forms.ValidationError('Title must be at least 5 Characters long.')
         
-        if content and len(content) < 10:
+        if content and len(content) < 100:
             raise forms.ValidationError('Content must be at least 10 Characters long.')
         
     def save(self, commit):

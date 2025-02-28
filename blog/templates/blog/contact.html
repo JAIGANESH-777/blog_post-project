@@ -4,28 +4,15 @@
     <div class="container-fluid ">
         <div class="d-flex justify-content-center mt-5">
             <div class="d-flex gap-3 flex-column">
-                <h3>Contact Form</h3>
-                {% comment %} {% for field in form %}
-                    {% if field.errors %}
-                        <div class="col-12">
-                        <span class="fw-bold">{{ field.label_tag }}</span>
-                        {% for error in field.errors %}
-                            <p class="text-danger">{{ error }}</p>
-                        {% endfor %}
-                        </div>
-                    {% endif %}
-                {% endfor %} {% endcomment %}
-
-                {%if success_message%}
-                <div class="alert alert-success">
-                    {{ success_message }}
+                <h3 class="text-decoration-underline">Contact Form</h3>
+                <div>
+                    {% include 'blog/include/error.html'%}
                 </div>
-                {% endif %}
                 <form method="post" class="row g-3">
                     {% csrf_token %} 
                     <div class="col-md-6">
                         <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" value="{{name}}" name="name" >
+                        <input type="text" class="form-control" id="name" value="{{form.username.value|default:""}}" name="name" >
                         {% if form.name.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.name.errors.0 }}</p>
@@ -34,7 +21,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" value="{{email}}" name="email" >
+                        <input type="email" class="form-control" id="email" value="{{form.email.value|default:""}}" name="email" >
                         {% if form.email.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.email.errors.0 }}</p>
@@ -43,14 +30,14 @@
                     </div>
                     <div class="col-12">
                         <label for="message" class="form-label">Message</label>
-                        <textarea class="form-control" id="message" value="{{message}}" name="message" rows="4" ></textarea>
+                        <textarea class="form-control" id="message" value="{{form.message.value|default:""}}" name="message" rows="4" ></textarea>
                         {% if form.message.errors %}
                             <div class="col-12">
                                 <p class="text-danger">{{ form.message.errors.0 }}</p>
                             </div>
                         {% endif %}
                     </div>
-                    <div class="col-12">
+                    <div class="col-12 button-container">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>

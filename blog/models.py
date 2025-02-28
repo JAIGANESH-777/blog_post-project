@@ -37,5 +37,16 @@ class Post(models.Model):
         return url
 
 
-class about_user(models.Model):
+
+class About_user(models.Model):
     content = models.TextField()
+
+class Contact(models.Model):
+    name=models.CharField(max_length=100)
+    email=models.EmailField()
+    message=models.TextField()
+    user=models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.name
+    

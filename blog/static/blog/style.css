@@ -1,3 +1,15 @@
 body {
     background-color: #cccccc;
 }
+
+.button-container button, .button-container a{
+    transition: transform 0.3s ease-in-out;
+}
+
+.button-container button:hover, .button-container a:hover{
+    transform: scale(1.02);
+}
+
+.nav-link-hover:hover {
+    color: grey !important;
+}

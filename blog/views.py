@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse
 from django.urls import reverse
 import logging
-from blog.models import Post,Category,about_user
+from blog.models import Post,Category,About_user
 from django.http import Http404
 from django.core.paginator import Paginator
 from .forms import ForgotPasswordForm, LoginForm, ContactForm, NewPostForm,RegisterForm, ResetPasswordForm
@@ -19,24 +19,21 @@ from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group
 
-
-# Create your views here.
-
-# posts = [
-#         {'id':1, 'title': 'Post 1', 'content': 'Content of Post 1'},
-#         {'id':2, 'title': 'Post 2', 'content': 'Content of Post 2'},
-#         {'id':3, 'title': 'Post 3', 'content': 'Content of Post 3'},
-#         {'id':4, 'title': 'Post 4', 'content': 'Content of Post 4'},   
-#     ]
 def index(request):
     all_post= Post.objects.filter(is_published=True)
-    paginator= Paginator(all_post,9)
+    paginator= Paginator(all_post,24)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     title= "latest posts"
     return render(request,"blog/index.html",{"title":title,"page_obj":page_obj})
      
 def detail(request,slug):
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in. Please log in to view the post.')
+        return redirect('blog:login')
+    if not request.user.has_perm('blog.view_post'):
+        messages.error(request, 'You have no permission to view any posts')
+        return redirect('blog:index')
     try:
         post= Post.objects.get(slug=slug)
         related_posts=Post.objects.filter(category=post.category).exclude(pk=post.id)
@@ -55,24 +52,20 @@ def new_url(request):
 
 def contact(request):
     title= "Contact"
+    form=ContactForm()
     if request.method=="POST":
         form=ContactForm(request.POST)
-        name=request.POST.get('name')
-        email=request.POST.get('email')
-        message=request.POST.get('message')
-        logger =logging.getLogger('testing')
         if form.is_valid():
-            #logger.debug(f"Form data is valid: {form.cleaned_data}")
-            success_message="Email sent Successfully"
-            return render(request,"blog/contact.html",{"form":form,"success_message":success_message,"title":title})
-        else:
-            #logger.debug(f"Form data is not valid: {form}")
-            return render(request,"blog/contact.html",{"form":form,"name":name,"email":email,"message":message,"title":title})
-    return render(request,"blog/contact.html",{"title":title})
+            feedback=form.save(commit=False)
+            feedback.user=request.user
+            feedback.save()
+            messages.success(request,"Feedback saved successfully")
+            return redirect('blog:contact')
+    return render(request,"blog/contact.html",{"title":title, "form":form})
 
 def about(request):
     title= "About"
-    about_user_content=about_user.objects.first()
+    about_user_content=About_user.objects.first()
     if not about_user_content:
         about_user_content="Welcome to blog – a space where ideas, insights, and inspiration come to life!At blog, we are passionate about sharing valuable content on your blogs niche, e.g., technology, health, personal growth, social impact]. Our goal is to provide well-researched, engaging, and thought-provoking articles that add value to your daily life."
     else:
@@ -89,7 +82,11 @@ def register(request):
             user.set_password(form.cleaned_data['password'])
             user.save()
             readers_group=Group.objects.get_or_create(name="Readers")
+            authors_group=Group.objects.get_or_create(name="Authors")
+            editors_group=Group.objects.get_or_create(name="Editors")
             user.groups.add(readers_group[0])
+            user.groups.add(authors_group[0])
+            user.groups.add(editors_group[0])
             #success_message="Registration Successful"
             messages.success(request, "Registration Successful")
             return redirect('blog:login')
@@ -113,9 +110,9 @@ def login(request):
 
 def dashboard(request):
     title= "Dashboard"
-    blog_title= "My Posts"
+    blog_title= "Your Posts"
     all_posts=Post.objects.filter(user=request.user)
-    paginator= Paginator(all_posts,3)
+    paginator= Paginator(all_posts,9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request,"blog/dashboard.html",{"title":title,"blog_title":blog_title,"page_obj":page_obj})
@@ -178,6 +175,7 @@ def reset_password(request, uidb64, token):
 
 
 @login_required
+@permission_required('blog.add_post', raise_exception=True)
 def new_post(request):
     title= "New Post"
     form=NewPostForm()
@@ -193,6 +191,7 @@ def new_post(request):
     return render(request,"blog/new_post.html",{"title":title,"categories":categories,"form":form})
 
 @login_required
+@permission_required('blog.change_post', raise_exception=True)
 def edit_post(request,post_id):
     title= "Edit Post"
     form=NewPostForm()
@@ -208,6 +207,7 @@ def edit_post(request,post_id):
     return render(request,"blog/edit_post.html",{"categories":categories,"title":title,"post":post,"form":form})
 
 @login_required
+@permission_required('blog.delete_post', raise_exception=True)
 def delete_post(request,post_id):
     post=get_object_or_404(Post,id=post_id)
     post.delete()
@@ -215,6 +215,7 @@ def delete_post(request,post_id):
     return redirect('blog:dashboard')
 
 @login_required
+@permission_required('blog.can_publish', raise_exception=True)
 def publish_post(request,post_id):
     post=get_object_or_404(Post,id=post_id)
     post.is_published=True

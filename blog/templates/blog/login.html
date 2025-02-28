@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row d-flex justify-content-center mt-5">
             <div class="col-4">
-                <h3>Login</h3>
+                <h3 class="text-decoration-underline">Login</h3>
                 <div class="">
                     <div class="col-12">
                         <span class="fw-bold"></span>
@@ -38,9 +38,13 @@
                             <p class="text-danger">{{ form.password.errors.0 }}</p>
                         </div>
                         {% endif %}
-                        <div class="my-3 d-flex justify-content-between">
+                        <div class="my-3 d-flex justify-content-around">
+                            <div class="col-6">
                             <a href={%url "blog:forgotpassword"%}>Forgot Password</a>
-                            <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
+                            <div class="col-6  d-flex justify-content-end button-container">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
                         </div>
                     </form>
                 </div>
