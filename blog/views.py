@@ -1,6 +1,4 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.http import HttpResponse
-from django.urls import reverse
 import logging
 from blog.models import Post,Category,About_user
 from django.http import Http404
@@ -12,7 +10,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.utils.encoding import force_bytes
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
@@ -38,17 +35,9 @@ def detail(request,slug):
         post= Post.objects.get(slug=slug)
         related_posts=Post.objects.filter(category=post.category).exclude(pk=post.id)
         title= post.title
-        # logger =logging.getLogger('testing')
-        # logger.debug(f"Post variable: {related_post}")
     except Post.DoesNotExist:
         raise Http404("Post not found")
     return render(request,"blog/detail.html",{"post":post,"related_posts":related_posts,"title":title})
-
-def old_url(request):
-    return redirect(reverse('blog:new_page'))
-
-def new_url(request):
-    return HttpResponse("This is the new URL.")
 
 def contact(request):
     title= "Contact"
@@ -87,7 +76,6 @@ def register(request):
             user.groups.add(readers_group[0])
             user.groups.add(authors_group[0])
             user.groups.add(editors_group[0])
-            #success_message="Registration Successful"
             messages.success(request, "Registration Successful")
             return redirect('blog:login')
     return render(request,"blog/register.html",{"form":form,"title":title})
@@ -125,14 +113,16 @@ def logout(request):
 def forgot_password(request):
     title= "Forgot Password"
     form = ForgotPasswordForm()
+    logger= logging.getLogger('TestForgotPassword')
     if request.method == 'POST':
-        #form
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
+            print(email)
             user = User.objects.get(email=email)
-            #send email to reset password
             token = default_token_generator.make_token(user)
+            logger.info(f"Generated Token: {token}, User: {user}, Token: {token}")
+            print("Generated Token:", token)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             current_site = get_current_site(request)
             domain = current_site.domain
@@ -147,7 +137,7 @@ def forgot_password(request):
             messages.success(request, 'Email has been sent')
 
 
-    return render(request,'blog/forgot_password.html', {'form': form})
+    return render(request,'blog/forgot_password.html', {'title':title,'form': form})
  
 def reset_password(request, uidb64, token):
     title= "Reset Password"
@@ -157,6 +147,7 @@ def reset_password(request, uidb64, token):
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
             new_password = form.cleaned_data['new_password']
+            print(new_password)
             try:
                 uid = urlsafe_base64_decode(uidb64)
                 user = User.objects.get(pk=uid)
@@ -170,8 +161,9 @@ def reset_password(request, uidb64, token):
                 return redirect('blog:login')
             else :
                 messages.error(request,'The password reset link is invalid')
-
-    return render(request,'blog/reset_password.html', {'form': form,"title": title})
+        else:
+            print('not valid')
+    return render(request,'blog/reset_password.html', {'form': form,'title':title})
 
 
 @login_required
@@ -203,7 +195,6 @@ def edit_post(request,post_id):
             post.save()
             messages.success(request, "Post updated successfully")
             return redirect('blog:dashboard')
-    #selected_category_id = post.category.id
     return render(request,"blog/edit_post.html",{"categories":categories,"title":title,"post":post,"form":form})
 
 @login_required

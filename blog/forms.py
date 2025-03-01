@@ -21,7 +21,7 @@ class ContactForm(forms.ModelForm):
 
 class RegisterForm(forms.ModelForm):
     username = forms.CharField(label='username', max_length=100, required=True)
-    email = forms.CharField(label='email', max_length=100, required=True)
+    email = forms.EmailField(label='email', max_length=100, required=True)
     password = forms.CharField(label='password', max_length=100, min_length=8, required=True)
     password_confirm = forms.CharField(label='password confirm', max_length=100, min_length=8, required=True)
 
@@ -50,12 +50,13 @@ class LoginForm(forms.Form):
                 raise forms.ValidationError("Invalid username or password")
             
 class ForgotPasswordForm(forms.Form):
-    email=forms.EmailField(label="Email",required=True)
+    email=forms.EmailField(label="email",required=True)
 
     def clean_email(self):
         email=self.cleaned_data.get('email')
         if not User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email does not exist")
+        return email
         
 class ResetPasswordForm(forms.Form):
     new_password = forms.CharField(label='New Password', min_length=8)
@@ -68,6 +69,7 @@ class ResetPasswordForm(forms.Form):
 
         if new_password and confirm_password and new_password != confirm_password:
             raise forms.ValidationError("Passwords do not match.")
+        #return cleaned_data
         
 class NewPostForm(forms.ModelForm):
     title = forms.CharField(label='Title', max_length=100, required=True)

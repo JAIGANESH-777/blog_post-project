@@ -3,14 +3,9 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row d-flex justify-content-center mt-5">
-            <div class="col-4">
+            <div style="width:600px; height:450px;" class="col-4 p-5 rounded shadow">
                 <h3 class="text-decoration-underline">Register</h3>
                 <div class="my-3">
-                    {% comment %} {%if success_message%}
-                        <div class="alert alert-success">
-                        {{ success_message }}
-                        </div>
-                    {% endif %} {% endcomment %}
                     {%include 'blog/include/error.html'%}
                     <form method="post">
                         {% csrf_token %} 

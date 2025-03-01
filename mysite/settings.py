@@ -145,13 +145,19 @@ LOGGING = {
     },
 }
 
-DEFAULT_FROM_EMAIL = 'jaiganesh10052004@gmail.com'
+import ssl
+
+DEFAULT_FROM_EMAIL ="jaiganesh@gmail.com"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER='c49cc07a5dffad'
-EMAIL_HOST_PASSWORD='<2f60629473ffd0'
+EMAIL_HOST_USER = 'c49cc07a5dffad'
+EMAIL_HOST_PASSWORD = '2f60629473ffd0'
+
+# Bypass SSL verification
+EMAIL_SSL_CONTEXT = ssl._create_unverified_context()
+
 
 import os
 

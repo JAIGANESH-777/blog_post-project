@@ -33,28 +33,38 @@
     <div class="row m-3">
         {% if page_obj %}
             {% for post in page_obj %}
-            <div class="col-12 col-md-6 col-sm-6 col-lg-4 mb-4">
+            <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-4">
                 <div class="card h-100 shadow">
                     <div class="card-body d-flex flex-column">
-                        <div class="row flex-grow-1 mb-2">
-                            <div class="col-md-6 col-sm-6 col-lg-6" style="width: 214px; height: 180px; overflow: hidden;">
-                                <img src="{{ post.formated_img_url }}" class="img-fluid w-100 h-100 object-fit-cover rounded" alt="...">
-                            </div> 
-                            <div class="col-md-6  d-flex flex-column h-100">
+                        <!-- Side-by-side layout -->
+                        <div class="row flex-grow-1 d-flex flex-column flex-md-row align-items-center">
+                            <!-- Image Section -->
+                            <div class="col-md-6 d-flex justify-content-center overflow-hidden" 
+                                 style="height:200px; width:214;">
+                                <img src="{{ post.formated_img_url }}" 
+                                     class="img-fluid w-100 h-100 object-fit-cover rounded" 
+                                     alt="...">
+                            </div>
+                            <!-- Content Section -->
+                            <div class="col-md-6 d-flex flex-column h-100 p-2">
                                 <h5 class="card-title">{{ post.title|truncatechars:30 }}</h5>
                                 <p class="card-text">{{ post.content|truncatechars:100 }}</p>
                                 <div class="mt-auto d-flex justify-content-between">
                                     <a href="{% url "blog:detail" slug=post.slug %}">Read More</a>
-                                    <div class="text-decoration-none text-dark fw-bold" href="#">{{ post.category }}</div>
+                                    <div class="text-decoration-none text-dark fw-bold">{{ post.category }}</div>
                                 </div>
                             </div>
                         </div>
+                        <!-- Buttons Section -->
                         <div class="row flex-grow-1">
-                            <div class="mt-auto d-flex justify-content-evenly mt-2 button-container" >
-                                <a class="btn btn-warning btn-md mt-2 px-4" href="{% url "blog:editpost" post_id=post.id %}">Edit</a>
-                                <button class="btn btn-danger btn-md mt-2" onclick="ConfirmBeforeDelete(`{% url 'blog:deletepost' post_id=post.id %}`)">Delete</button>
+                            <div class="mt-auto d-flex justify-content-evenly mt-2 button-container">
+                                <a class="btn btn-warning btn-md mt-2 px-4" 
+                                   href="{% url "blog:editpost" post_id=post.id %}">Edit</a>
+                                <button class="btn btn-danger btn-md mt-2" 
+                                        onclick="ConfirmBeforeDelete(`{% url 'blog:deletepost' post_id=post.id %}`)">Delete</button>
                                 {% if not post.is_published and perms.blog.can_publish %}
-                                    <button class="btn btn-success btn-md mt-2" onclick="ConfirmBeforePublish(`{% url 'blog:publishpost' post_id=post.id %}`)">Publish Post</button>
+                                    <button class="btn btn-success btn-md mt-2" 
+                                            onclick="ConfirmBeforePublish(`{% url 'blog:publishpost' post_id=post.id %}`)">Publish Post</button>
                                 {% endif %}
                             </div>
                         </div>
